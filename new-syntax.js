@@ -13,6 +13,10 @@ class User {
     this.age = age;
   }
 
+  isAdult() {
+    return this.age >= 18;
+  }
+
   getFullName() {
     return `${this.name} ${this.surname}`;
   }
@@ -51,6 +55,4 @@ class Worker {
 
 }
 
-const worker1 = new Worker( 'Name1', 'Surname1', 200, 10 );
-const worker2 = new Worker( 'Name2', 'Surname2', 40, 20 );
 
