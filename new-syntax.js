@@ -1,76 +1,87 @@
 'use strict';
 
-class User {
-  constructor(name, surname, age, email, isBanned = false) {
-    this._name = name;
-    this._surname = surname;
-    this._age = age;
-    this._email = email;
-    this._isBanned = isBanned;
+function MyArray() {
+  this.length = 0;
+  for (let i = 0; i < arguments.length; i++) {
+    this[this.length++] = arguments[i];
   }
+}
 
-  set isBanned(v) {
-    if (typeof v !== 'boolean') {
-      throw new TypeError();
+MyArray.isMyArray = function (obj) {
+  return obj instanceof this;
+};
+
+MyArray.prototype = {
+  length: 0,
+  push() {
+    for (let i = 0; i < arguments.length; i++) {
+      this[this.length++] = arguments[i];
     }
-    this._isBanned = v;
-  }
+    return this.length;
+  },
+  concat() {
+    const result = new MyArray();
 
-  get email() {
-    return this._email;
-  }
+    for (let i = 0; i < this.length; i++) {
+      result.push( this[i] );
+    }
 
-  getFullName() {
-    return `${this._name} ${this._surname}`;
-  }
+    for (let i = 0; i < arguments.length; i++) {
+      if (MyArray.isMyArray( arguments[i] )) {
+        for (let j = 0; j < arguments[i].length; j++) {
+          result.push( arguments[i][j] );
+        }
+        continue;
+      }
+      result.push( arguments[i] );
+    }
 
-  isAdult() {
-    return this._age > 17;
-  }
+    return result;
+  },
+  flat(dept = 1) {
+    let result = new MyArray();
+    for (let i = 0; i < this.length; i++) {
+      if (MyArray.isMyArray( this[i] ) && dept > 0) {
+        const tmp = this[i].flat( dept - 1 );
+        result = result.concat( tmp );
+      } else if (this[i] !== undefined) {
+        result.push( this[i] );
+      }
+    }
+    return result;
+  },
+};
 
-}
+const arr = new MyArray(
+  new MyArray(
+    1,
+    undefined,
+    1,
+  ),
+  0,
+  undefined,
+  0,
+  0,
+  new MyArray(
+    1,
+    undefined,
+    undefined,
+    1,
+    new MyArray(
+      2,
+      new MyArray(
+        undefined,
+        undefined,
+        3,
+        3,
+        3,
+      ),
+      undefined,
+      2,
+      2,
+    ),
+    1,
+  )
+);
 
-class Admin extends User {
-
-  constructor(name, surname, age, email) {
-    super( name, surname, age, email, false );
-  }
-
-  reBan(user) {
-    user.isBanned = false;
-  }
-
-  ban(user) {
-    user.isBanned = true;
-  }
-
-}
-
-class Moderator extends User {
-
-  constructor(name, surname, age, email, permission) {
-    super( name, surname, age, email );
-
-    this._permission = permission;
-  }
-
-  sendMessage(user, message) {
-
-    const userEmail = user.email;
-    /*
-     * send message code
-     * */
-  }
-
-}
-
-const user1 = new User( 'Nasme', 'Suisdf', 14, 'test@gmail.com' );
-
-const moder1 = new Moderator( 'Moder', 'Moderovich', 24, 'moder@email.com', {} );
-
-user1.isAdult();
-user1.getFullName();
-
-moder1.isAdult();
-moder1.getFullName();
-moder1.sendMessage( user1, { body: 'Hello' } );
+const flattedArr = arr.flat();
